@@ -7,7 +7,7 @@ namespace DraughtsGame
     public class Board
     {    
         // Represents all the positions on the board
-        int[,] piecePositions = new int[8,8];
+        public int[,] piecePositions = new int[8,8];
         string errorMessage = null;
 
         public Board()
@@ -58,88 +58,19 @@ namespace DraughtsGame
             Console.WriteLine("   1 2 3 4 5 6 7 8");
         }
 
-        public bool MakeMove(int player, int columnFrom, int rowFrom, int columnTo, int rowTo)
+        public bool MakeMove(int player, int xFrom, int yFrom, int xTo, int yTo)
         {
-            int piece = piecePositions[columnFrom, rowFrom];
+            int pieceFrom = piecePositions[xFrom, xTo];
 
-            if (MovedDiagonal(player, columnFrom, rowFrom, columnTo, rowTo) && EmptySpace(columnTo, rowTo))
+            if (Rules.IsMovingDiagonally(piecePositions, player, xFrom, yFrom, xTo, yTo) && Rules.IsEmptySpace(piecePositions, xTo, yTo))
             {
-                piecePositions[rowTo, columnTo] = piecePositions[rowFrom, columnFrom];
-                piecePositions[rowFrom, columnFrom] = 0;
-            }
-                       
-            return false;
-        }
-
-        private bool MovedDiagonal(int player, int columnFrom, int rowFrom, int columnTo, int rowTo)
-        {
-            bool normalMove = (rowTo == rowFrom + 1 || rowTo == rowFrom - 1) && (columnTo == columnFrom + 1 || columnTo == columnFrom - 1);
-            bool takingPiece = (rowTo == rowFrom + 2 || rowTo == rowFrom - 2) && (columnTo == columnFrom + 2 || columnTo == columnFrom - 2);
-
-            if ((normalMove || (takingPiece && LegalCapture(player, columnFrom, rowFrom, columnTo, rowTo))))
-            {
+                piecePositions[xTo, yTo] = pieceFrom;
+                piecePositions[xFrom, yFrom] = 0;                
                 return true;
             }
 
-            if (errorMessage == null)
-            {
-                errorMessage = "Movement was not diagonal";
-            }
-
+            Console.WriteLine(errorMessage);                       
             return false;
-        }
-
-        private bool EmptySpace(int columnTo, int rowTo)
-        {
-            var test = piecePositions[rowTo, columnTo];
-            return ( test == 0);    
-        }
-
-        private bool LegalCapture(int player, int columnFrom, int rowFrom, int columnTo, int rowTo)
-        {
-            int rowToCheck = -1;
-            int columnToCheck = -1;
-            
-            if (columnTo > columnFrom)
-            {
-                columnToCheck = columnFrom + 1;
-            }
-            else if (columnTo < columnFrom)
-            {
-                columnToCheck = columnFrom - 1;
-            }
-
-            if (rowTo > rowFrom)
-            {
-                rowToCheck = rowFrom + 1;
-            }
-            else if (rowTo < rowFrom)
-            {
-                rowToCheck = rowFrom - 1;
-            }
-
-            if (columnToCheck != -1 && rowToCheck != -1 && (piecePositions[rowToCheck, columnToCheck] != 0 || !BelongsToPlayer(piecePositions[rowToCheck, columnToCheck], player == 1 ? 2 : 1)))
-            {
-                return true;
-            }
-
-            errorMessage = "That is not a legal capture";
-            return false;
-        }
-
-        private bool BelongsToPlayer(int piece, int player)
-        {
-            if (player == 1 && (piece == 1 || piece == 3))
-            {
-                return true;
-            }
-            else if (player == 1 && (piece == 1 || piece == 3))
-            {
-                return true;
-            }
-
-            errorMessage = "Piece at that position does not belong to the player";
-            return false;
-        }
+        }       
     }
 }

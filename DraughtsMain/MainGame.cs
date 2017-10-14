@@ -20,7 +20,7 @@ namespace DraughtsGame
                 if (IsInCorrectFormat(cmd))
                 {
                     board.MakeMove(player, int.Parse(cmd.Substring(0, 1)) - 1, int.Parse(cmd.Substring(2, 1)) - 1, int.Parse(cmd.Substring(4,1)) - 1, int.Parse(cmd.Substring(6,1)) - 1);
-                    player = player == 1 ? player++ : player--;
+                    player = player == 1 ? player + 1 : player - 1;
                 }
                 else
                 {
