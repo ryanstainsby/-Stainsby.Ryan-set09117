@@ -61,5 +61,35 @@ namespace DraughtsTests
 
             Assert.IsFalse(board.MakeMove(1, 3, 4, 2, 5));
         }
+
+        [TestMethod]
+        public void IsMovingDiagonally_WhiteKingMovingDiagonallyBackwards_True()
+        {
+            board.piecePositions = new int[,]{ { 0, 3, 0, 2, 0, 2, 0, 2 },
+                                               { 0, 0, 0, 0, 2, 0, 2, 0 },
+                                               { 0, 0, 0, 2, 0, 2, 0, 2 },
+                                               { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                               { 0, 0, 0, 1, 0, 0, 0, 0 },
+                                               { 1, 0, 0, 0, 1, 0, 1, 0 },
+                                               { 0, 1, 0, 1, 0, 1, 0, 1 },
+                                               { 1, 0, 1, 0, 1, 0, 1, 0 } };
+
+            Assert.IsTrue(board.MakeMove(1, 0, 1, 1, 0));
+        }
+
+        [TestMethod]
+        public void IsMovingDiagonally_BlackKingMovingDiagonallyBackwards_True()
+        {
+            board.piecePositions = new int[,]{ { 0, 2, 0, 2, 0, 2, 0, 2 },
+                                               { 2, 0, 2, 0, 2, 0, 2, 0 },
+                                               { 0, 2, 0, 2, 0, 2, 0, 2 },
+                                               { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                               { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                               { 0, 0, 1, 0, 1, 0, 1, 0 },
+                                               { 0, 0, 0, 1, 0, 1, 0, 1 },
+                                               { 4, 0, 1, 0, 1, 0, 1, 0 } };
+
+            Assert.IsTrue(board.MakeMove(2, 7, 0, 6, 1));
+        }
     }
 }

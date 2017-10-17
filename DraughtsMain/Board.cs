@@ -60,11 +60,24 @@ namespace DraughtsGame
 
         public bool MakeMove(int player, int xFrom, int yFrom, int xTo, int yTo)
         {
-            int pieceFrom = piecePositions[xFrom, xTo];
+            int piece = piecePositions[xFrom, yFrom];
 
             if (Rules.IsMovingDiagonally(piecePositions, player, xFrom, yFrom, xTo, yTo) && Rules.IsEmptySpace(piecePositions, xTo, yTo))
             {
-                piecePositions[xTo, yTo] = pieceFrom;
+                // Check if piece should be switched to a king
+                if (piece == Pieces.White_Man && xTo == 0)
+                {
+                    piecePositions[xTo, yTo] = Pieces.White_King;
+                }
+                else if (piece == Pieces.Black_Man && xTo == 7)
+                {
+                    piecePositions[xTo, yTo] = Pieces.Black_King;
+                }
+                else
+                {
+                    piecePositions[xTo, yTo] = piece;
+                }
+
                 piecePositions[xFrom, yFrom] = 0;                
                 return true;
             }
