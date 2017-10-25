@@ -13,13 +13,13 @@ namespace DraughtsGame
         public Board()
         {
             // A new board with all pieces in their original positions
-            piecePositions = new int[,]{ { 0, 2, 0, 2, 0, 2, 0, 2 }, 
-                                         { 2, 0, 2, 0, 2, 0, 2, 0 }, 
-                                         { 0, 2, 0, 2, 0, 2, 0, 2 }, 
-                                         { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                                         { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                                         { 1, 0, 1, 0, 1, 0, 1, 0 }, 
-                                         { 0, 1, 0, 1, 0, 1, 0, 1 }, 
+            piecePositions = new int[,]{ { 0, 2, 0, 2, 0, 2, 0, 2 },
+                                         { 2, 0, 2, 0, 2, 0, 2, 0 },
+                                         { 0, 2, 0, 2, 0, 2, 0, 2 },
+                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                         { 1, 0, 1, 0, 1, 0, 1, 0 },
+                                         { 0, 1, 0, 1, 0, 1, 0, 1 },
                                          { 1, 0, 1, 0, 1, 0, 1, 0 } };
         }
 
@@ -62,7 +62,7 @@ namespace DraughtsGame
         {
             int piece = piecePositions[xFrom, yFrom];
 
-            if (Rules.IsMovingDiagonally(piecePositions, player, xFrom, yFrom, xTo, yTo) && Rules.IsEmptySpace(piecePositions, xTo, yTo))
+            if (Rules.IsPlayersPiece(piecePositions, player, xFrom, yFrom) && Rules.IsMovingDiagonally(piecePositions, player, xFrom, yFrom, xTo, yTo) && Rules.IsEmptySpace(piecePositions, xTo, yTo))
             {
                 // Check if piece should be switched to a king
                 if (piece == Pieces.White_Man && xTo == 0)
