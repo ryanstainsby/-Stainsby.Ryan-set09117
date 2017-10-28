@@ -7,9 +7,8 @@ namespace DraughtsGame
     public static class Rules
     {
         // Players piece
-        public static bool IsPlayersPiece(int[,] board, int player, int xFrom, int yFrom)
+        public static bool IsPlayersPiece(int[,] board, int player, int piece)
         {
-            int piece = board[xFrom, yFrom];
             bool playerOnes = piece == Pieces.White_Man || piece == Pieces.White_King;
             bool playerTwos = piece == Pieces.Black_Man || piece == Pieces.Black_King;
 
@@ -22,14 +21,14 @@ namespace DraughtsGame
         }
 
         // Moving diagonally
-        public static bool IsMovingDiagonally(int[,] board, int player, int xFrom, int yFrom, int xTo, int yTo)
+        public static bool IsMovingDiagonally(int[,] board, int player, Move move)
         {
-            bool isWhiteKing = board[xFrom, yFrom] == Pieces.White_King;
-            bool isBlackKing = board[xFrom, yFrom] == Pieces.Black_King;
-            bool whiteForward = (xTo == xFrom - 1 || (isWhiteKing && xTo == xFrom + 1)) && (yTo == yFrom + 1 || yTo == yFrom - 1);
-            bool whiteTaking = (xTo == xFrom - 2 || (isWhiteKing && xTo == xFrom + 2)) && (yTo == yFrom + 2 || yTo == yFrom - 2);
-            bool blackForward = (xTo == xFrom + 1 || (isBlackKing && xTo == xFrom - 1)) && (yTo == yFrom + 1 || yTo == yFrom - 1);
-            bool blackTaking = (xTo == xFrom + 2 || (isBlackKing && xTo == xFrom - 2)) && (yTo == yFrom + 2 || yTo == yFrom - 2);
+            bool isWhiteKing = move.Piece == Pieces.White_King;
+            bool isBlackKing = move.Piece == Pieces.Black_King;
+            bool whiteForward = (move.XTo == move.XFrom - 1 || (isWhiteKing && move.XTo == move.XFrom + 1)) && (move.YTo == move.YFrom + 1 || move.YTo == move.YFrom - 1);
+            bool whiteTaking = (move.XTo == move.XFrom - 2 || (isWhiteKing && move.XTo == move.XFrom + 2)) && (move.YTo == move.YFrom + 2 || move.YTo == move.YFrom - 2);
+            bool blackForward = (move.XTo == move.XFrom + 1 || (isBlackKing && move.XTo == move.XFrom - 1)) && (move.YTo == move.YFrom + 1 || move.YTo == move.YFrom - 1);
+            bool blackTaking = (move.XTo == move.XFrom + 2 || (isBlackKing && move.XTo == move.XFrom - 2)) && (move.YTo == move.YFrom + 2 || move.YTo == move.YFrom - 2);
 
             if (player == Pieces.Player_1)
             {
@@ -42,11 +41,13 @@ namespace DraughtsGame
 
             bool IsCapturingOpponent(int opponent)
             {
-                int xSpaceMovedOver = player == 1 ? xFrom - 1 : xFrom + 1;
-                int ySpaceMovedOver = yTo > yFrom ? yFrom + 1 : yFrom - 1;
+                int xSpaceMovedOver = player == 1 ? move.XFrom - 1 : move.XFrom + 1;
+                int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
+                int opponentsPiece = board[xSpaceMovedOver, ySpaceMovedOver];
 
-                if (!IsPlayersPiece(board, opponent, xSpaceMovedOver, ySpaceMovedOver))
+                if (!IsPlayersPiece(board, opponent, opponentsPiece))
                 {
+                    move.PieceTaken = opponentsPiece;
                     return true;
                 }
 
@@ -55,6 +56,6 @@ namespace DraughtsGame
         }
 
         // Space is empty
-        public static bool IsEmptySpace(int[,] board, int xTo, int yTo) => board[xTo, yTo] == Pieces.Empty;
+        public static bool IsEmptySpace(int[,] board, Move move) => board[move.XTo, move.YTo] == Pieces.Empty;
     }
 }

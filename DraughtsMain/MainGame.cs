@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace DraughtsGame
 {
@@ -6,11 +7,12 @@ namespace DraughtsGame
     {
         static void Main(string[] args)
         {
-            Board board = new Board();
-
+            var board = new Board();
+            var logger = new MoveLogger();
             string cmd = string.Empty;
-            string message = "Player 1 please make a move? (Format: rowFrom,columnFrom,rowTo,columnTo)";
+            string message = "Player 1 please make a move? (Format: columnFrom,rowFrom,columnTo,rowTo)";
             int player = 1;
+
             while (cmd != "exit")
             {
                 board.PrintBoard();
@@ -18,17 +20,42 @@ namespace DraughtsGame
                 Console.WriteLine(message);
                 cmd = Console.ReadLine();
 
-                if (IsInCorrectFormat(cmd))
+                if (IsInMoveFormat(cmd))
                 {
-                    if (board.MakeMove(player, int.Parse(cmd.Substring(0, 1)) - 1, int.Parse(cmd.Substring(2, 1)) - 1, int.Parse(cmd.Substring(4, 1)) - 1, int.Parse(cmd.Substring(6, 1)) - 1))
+                    int xFrom = int.Parse(cmd.Substring(2, 1)) - 1;
+                    int yFrom = int.Parse(cmd.Substring(0, 1)) - 1;
+                    int xTo = int.Parse(cmd.Substring(6, 1)) - 1;
+                    int yTo = int.Parse(cmd.Substring(4, 1)) - 1;
+
+                    Move move = new Move(xFrom, yFrom, xTo, yTo);
+
+                    if (board.MakeMove(player, move))
                     {
-                        player = player == 1 ? player + 1 : player - 1;
+                        logger.AddMove(move);
+                        player = player == 1 ? 2 : 1;
                         message = $"Player {player} please make a move? (Format: columnFrom,rowFrom,columnTo,rowTo)";
                     }
                     else
                     {
                         message = $"That move is not legal, player {player} please try another move";
                     }                    
+                }
+                else if (cmd == "print log")
+                {
+                    logger.PrintLog();
+                }
+                else if (cmd == "undo")
+                {
+                    if (logger.IsEmpty())
+                    {
+                        Console.WriteLine("No moves to undo");
+                    }
+                    else
+                    {
+                        board.UndoMove(logger.UndoMove());
+                        player = player == 1 ? 2 : 1;
+                        message = $"Player {player} please make a move? (Format: columnFrom,rowFrom,columnTo,rowTo)";
+                    }                
                 }
                 else
                 {
@@ -37,8 +64,8 @@ namespace DraughtsGame
             }
         }
 
-        // Check that the user has entered a column and a row
-        private static bool IsInCorrectFormat (string cmd)
+        // Check if the user has entered a column and a row
+        private static bool IsInMoveFormat(string cmd)
         {
             if (System.Text.RegularExpressions.Regex.IsMatch(cmd, "[1-8],[1-8],[1-8],[1-8]") )
             {
@@ -46,6 +73,6 @@ namespace DraughtsGame
             }
 
             return false;
-        }
+        }        
     }
 }

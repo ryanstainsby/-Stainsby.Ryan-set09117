@@ -12,13 +12,15 @@ namespace DraughtsTests
         [TestMethod]
         public void IsEmptySpace_MoveToEmpty_True()
         {
-            Assert.IsTrue(board.MakeMove(1, 5, 0, 4, 1));
+            Move move = new Move(5, 0, 4, 1);
+            Assert.IsTrue(board.MakeMove(1, move));
         }
 
         [TestMethod]
         public void IsEmptySpace_MoveToNonEmpty_False()
         {
-            Assert.IsFalse(board.MakeMove(1, 7, 0, 6, 1));
+            Move move = new Move(7, 0, 6, 1);
+            Assert.IsFalse(board.MakeMove(1, move));
         }
     }
 }

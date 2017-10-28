@@ -58,32 +58,40 @@ namespace DraughtsGame
             Console.WriteLine("   1 2 3 4 5 6 7 8");
         }
 
-        public bool MakeMove(int player, int xFrom, int yFrom, int xTo, int yTo)
+        public bool MakeMove(int player, Move move)
         {
-            int piece = piecePositions[xFrom, yFrom];
+            // Assign the piece being moved to the move
+            move.Piece = piecePositions[move.XFrom, move.YFrom];
 
-            if (Rules.IsPlayersPiece(piecePositions, player, xFrom, yFrom) && Rules.IsMovingDiagonally(piecePositions, player, xFrom, yFrom, xTo, yTo) && Rules.IsEmptySpace(piecePositions, xTo, yTo))
+            if (Rules.IsPlayersPiece(piecePositions, player, move.Piece) && Rules.IsMovingDiagonally(piecePositions, player, move) && Rules.IsEmptySpace(piecePositions, move))
             {
                 // Check if piece should be switched to a king
-                if (piece == Pieces.White_Man && xTo == 0)
+                if (move.Piece == Pieces.White_Man && move.XTo == 0)
                 {
-                    piecePositions[xTo, yTo] = Pieces.White_King;
+                    piecePositions[move.XTo, move.YTo] = Pieces.White_King;
                 }
-                else if (piece == Pieces.Black_Man && xTo == 7)
+                else if (move.Piece == Pieces.Black_Man && move.XTo == 7)
                 {
-                    piecePositions[xTo, yTo] = Pieces.Black_King;
+                    piecePositions[move.XTo, move.YTo] = Pieces.Black_King;
                 }
                 else
                 {
-                    piecePositions[xTo, yTo] = piece;
+                    piecePositions[move.XTo, move.YTo] = move.Piece;
                 }
 
-                piecePositions[xFrom, yFrom] = 0;                
+                piecePositions[move.XFrom, move.YFrom] = 0;           
+                
                 return true;
             }
 
             Console.WriteLine(errorMessage);                       
             return false;
         }       
+
+        public void UndoMove(Move move)
+        {
+            piecePositions[move.XFrom, move.YFrom] = move.Piece;
+            piecePositions[move.XTo, move.YTo] = move.PieceTaken; // Will default to 0 if no piece is taken
+        }
     }
 }
