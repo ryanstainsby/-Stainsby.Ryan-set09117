@@ -41,11 +41,11 @@ namespace DraughtsGame
 
             bool IsCapturingOpponent(int opponent)
             {
-                int xSpaceMovedOver = player == 1 ? move.XFrom - 1 : move.XFrom + 1;
+                int xSpaceMovedOver = move.XTo > move.XFrom ? move.XFrom + 1 : move.XFrom - 1;
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
                 int opponentsPiece = board[xSpaceMovedOver, ySpaceMovedOver];
 
-                if (!IsPlayersPiece(board, opponent, opponentsPiece))
+                if (IsPlayersPiece(board, opponent, opponentsPiece))
                 {
                     move.PieceTaken = opponentsPiece;
                     return true;
@@ -53,6 +53,12 @@ namespace DraughtsGame
 
                 return false;
             }
+        }
+
+        // Piece is moving within the boundries of the board
+        public static bool IsWithinBoard(Move move)
+        {
+            return (move.XTo < 8 && move.XTo >= 0 && move.YTo < 8 && move.YTo >= 0);
         }
 
         // Space is empty

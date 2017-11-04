@@ -12,6 +12,7 @@ namespace DraughtsGame
         private int _yTo;
         private int _piece;
         private int _pieceTaken;
+        private bool _createdKing;
 
         public Move(int xFrom, int yFrom, int xTo, int yTo)
         {
@@ -19,6 +20,7 @@ namespace DraughtsGame
             _yFrom = yFrom;
             _xTo = xTo;
             _yTo = yTo;
+            _createdKing = false;
         }
 
         public int XFrom { get => _xFrom; set => _xFrom = value; }
@@ -27,5 +29,6 @@ namespace DraughtsGame
         public int YTo { get => _yTo; set => _yTo = value; }
         public int Piece { get => _piece; set => _piece = value; }
         public int PieceTaken { get => _pieceTaken; set => _pieceTaken = value; }
+        public bool CreatedKing { get => _createdKing; set => _createdKing = value; }
     }
 }

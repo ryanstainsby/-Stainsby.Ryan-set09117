@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace DraughtsGame
@@ -9,12 +10,25 @@ namespace DraughtsGame
         {
             var board = new Board();
             var logger = new MoveLogger();
+            var ai = new DraughtsAI();
             string cmd = string.Empty;
             string message = "Player 1 please make a move? (Format: columnFrom,rowFrom,columnTo,rowTo)";
             int player = 1;
 
+
             while (cmd != "exit")
             {
+                // Testing that tree can be generated correctly
+                MoveNode node = ai.MoveTree(board, null, player, 7);
+                int highest = 0;
+                int lowest = 0;
+                List<int> values = new List<int>();
+                GetAllNodeValues(node, values);
+                foreach (var idk in values)
+                {
+                    if (idk > highest) highest = idk;
+                    if (idk < lowest) lowest = idk;
+                }
                 board.PrintBoard();
 
                 Console.WriteLine(message);
@@ -73,6 +87,16 @@ namespace DraughtsGame
             }
 
             return false;
-        }        
+        }
+
+        private static void GetAllNodeValues(MoveNode ogNode, List<int> values)
+        {
+            values.Add(ogNode.Value);
+
+            foreach (MoveNode node in ogNode.Children)
+            {
+                GetAllNodeValues(node, values);
+            }
+        }
     }
 }

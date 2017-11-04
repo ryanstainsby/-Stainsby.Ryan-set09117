@@ -35,6 +35,18 @@ namespace DraughtsGame
             }            
         }
 
+        public Move GetLastMove()
+        {
+            if (moveList.Count > 0)
+            {
+                return moveList.First.Value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public bool IsEmpty()
         {
             return moveList.Count == 0;

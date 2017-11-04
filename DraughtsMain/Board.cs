@@ -63,30 +63,33 @@ namespace DraughtsGame
             // Assign the piece being moved to the move
             move.Piece = piecePositions[move.XFrom, move.YFrom];
 
-            if (Rules.IsPlayersPiece(piecePositions, player, move.Piece) && Rules.IsMovingDiagonally(piecePositions, player, move) && Rules.IsEmptySpace(piecePositions, move))
+            if (Rules.IsWithinBoard(move) && Rules.IsPlayersPiece(piecePositions, player, move.Piece) && Rules.IsMovingDiagonally(piecePositions, player, move) && Rules.IsEmptySpace(piecePositions, move))
             {
-                // Check if piece should be switched to a king
-                if (move.Piece == Pieces.White_Man && move.XTo == 0)
-                {
-                    piecePositions[move.XTo, move.YTo] = Pieces.White_King;
-                }
-                else if (move.Piece == Pieces.Black_Man && move.XTo == 7)
-                {
-                    piecePositions[move.XTo, move.YTo] = Pieces.Black_King;
-                }
-                else
-                {
-                    piecePositions[move.XTo, move.YTo] = move.Piece;
-                }
 
-                piecePositions[move.XFrom, move.YFrom] = 0;           
+                    // Check if piece should be switched to a king
+                    if (move.Piece == Pieces.White_Man && move.XTo == 0)
+                    {
+                        piecePositions[move.XTo, move.YTo] = Pieces.White_King;
+                        move.CreatedKing = true;
+                    }
+                    else if (move.Piece == Pieces.Black_Man && move.XTo == 7)
+                    {
+                        piecePositions[move.XTo, move.YTo] = Pieces.Black_King;
+                        move.CreatedKing = true;
+                    }
+                    else
+                    {
+                        piecePositions[move.XTo, move.YTo] = move.Piece;
+                    }
+
+                    piecePositions[move.XFrom, move.YFrom] = 0;
                 
+
                 return true;
             }
 
-            Console.WriteLine(errorMessage);                       
             return false;
-        }       
+        }
 
         public void UndoMove(Move move)
         {
