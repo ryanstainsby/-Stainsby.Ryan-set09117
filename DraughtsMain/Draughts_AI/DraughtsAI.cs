@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
  
 namespace DraughtsGame
 {
@@ -8,30 +9,41 @@ namespace DraughtsGame
     {
         int? originalPlayer = null;
 
-        //public Move MakeMove(Board board, MoveNode moveTree, int player, int depth)
-        //{
-        //    return MoveTree(board, null, player, depth).BestMove.Move;
-        //}
+        public Move GetBestMove(Board board, MoveNode moveTree, int player, int depth)
+        {
+            MoveNode nextMove = MoveTree(board, null, player, depth);
+
+            var highestValues = nextMove.Children.GroupBy(x => x.Value).OrderByDescending(g => g.Key).First().ToArray();
+            var random = new Random();
+            MoveNode randomMove = highestValues[random.Next(highestValues.Count() - 1)];
+            
+            return (randomMove.Move);
+        }
 
         public MoveNode MoveTree(Board board, MoveNode prevMove, int player, int depth)
         {
             MoveNode currentPosition = prevMove ?? new MoveNode(board, prevMove?.Move ?? null, null);
 
-            if (prevMove != null && prevMove.Value != 0)
-            {
-
-            }
             if (originalPlayer == null) originalPlayer = player;
 
             if (depth != 0)
             {
-                var allMoves = FindAllLegalMoves(currentPosition, player);
-                foreach (var move in allMoves)
+                int bestMoveScore = player == originalPlayer.Value ? 0 : -100;
+
+                foreach (var move in FindAllLegalMoves(currentPosition, player))
                 {
                     MoveNode possibleMove = MoveTree(move.Board, move, player == 1 ? 2 : 1, depth - 1);
-                    possibleMove.Parent = currentPosition;                    
+
+                    if (possibleMove.Value > bestMoveScore)
+                    {
+                        bestMoveScore = possibleMove.Value;
+                    }
+
+                    possibleMove.Parent = currentPosition;
                     currentPosition.AddChild(possibleMove);
                 }
+
+                currentPosition.Value += bestMoveScore;
             }
 
             return currentPosition;
