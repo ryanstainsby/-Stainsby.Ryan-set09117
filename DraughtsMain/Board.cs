@@ -26,7 +26,7 @@ namespace DraughtsGame
         public void PrintBoard()
         {
             int printCount = 1;
-            int rowNum = 72;
+            int rowNum = 8;
 
             foreach (var item in piecePositions)
             {
@@ -58,7 +58,7 @@ namespace DraughtsGame
                 if (printCount % 8 == 0)
                 {
                     Console.WriteLine(piece);
-                    Console.WriteLine("|");
+                    Console.WriteLine(" |");
                 }
                 else
                 {
@@ -75,7 +75,7 @@ namespace DraughtsGame
             }
 
             Console.WriteLine("  ------------------------");
-            Console.WriteLine("    A  B  C  D  E  F  G  H");
+            Console.WriteLine("   A  B  C  D  E  F  G  H");
         }
 
         public bool MakeMove(int player, Move move)
@@ -122,6 +122,44 @@ namespace DraughtsGame
         {
             piecePositions[move.XFrom, move.YFrom] = move.Piece;
             piecePositions[move.XTo, move.YTo] = move.PieceTaken; // Will default to 0 if no piece is taken
+        }
+
+        /// <summary>
+        /// Converts user input into array positions and returns a move
+        /// </summary>
+        public Move GenerateMoveFromUserInput(int xFrom, string yFrom, int xTo, string yTo)
+        {
+            int newXFrom = SwitchPositions(xFrom);
+            int newYFrom = ((yFrom.ToLower().ToCharArray()[0])) - 97;
+            int newXTo = SwitchPositions(xTo);
+            int newYTo = ((yTo.ToLower().ToCharArray()[0])) - 97;
+
+            return new Move(newXFrom, newYFrom, newXTo, newYTo);
+
+            int SwitchPositions(int x)
+            {
+                switch(x)
+                {
+                    case 1:
+                        return 7;
+                    case 2:
+                        return 6;
+                    case 3:
+                        return 5;
+                    case 4:
+                        return 4;
+                    case 5:
+                        return 3;
+                    case 6:
+                        return 2;
+                    case 7:
+                        return 1;
+                    case 8:
+                        return 0;
+                    default:
+                        return 0;
+                }
+            }
         }
     }
 }
