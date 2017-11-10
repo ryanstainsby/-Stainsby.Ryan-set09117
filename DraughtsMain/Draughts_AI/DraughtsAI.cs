@@ -9,9 +9,10 @@ namespace DraughtsGame
     {
         int? originalPlayer = null;
 
-        public Move GetBestMove(Board board, MoveNode moveTree, int player, int depth)
+        public Move GetBestMove(Board board, MoveNode prevMove, int player, int depth)
         {
-            MoveNode nextMove = MoveTree(board, null, player, depth);
+            originalPlayer = player;
+            MoveNode nextMove = MoveTree(board, prevMove, player, depth);
 
             var highestValues = nextMove.Children.GroupBy(x => x.Value).OrderByDescending(g => g.Key).First().ToArray();
             var random = new Random();
@@ -23,8 +24,6 @@ namespace DraughtsGame
         public MoveNode MoveTree(Board board, MoveNode prevMove, int player, int depth)
         {
             MoveNode currentPosition = prevMove ?? new MoveNode(board, prevMove?.Move ?? null, null);
-
-            if (originalPlayer == null) originalPlayer = player;
 
             if (depth != 0)
             {
@@ -128,7 +127,7 @@ namespace DraughtsGame
                     {
                         if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
                         {
-                            moveValue -= 10;
+                            moveValue -= 9;
                         }
 
                         if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
@@ -138,7 +137,7 @@ namespace DraughtsGame
 
                         if (move.CreatedKing)
                         {
-                            moveValue -= 5;
+                            moveValue -= 4;
                         }
                     }
 
@@ -147,22 +146,6 @@ namespace DraughtsGame
                     moves.Add(moveNode);
                 }
             }
-        }
-
-        private int[,] DeepCopyArray(int[,] toCopy, int arrySize)
-        {
-            var newArry = new int[8, 8];
-
-            for (int i = 0; i < arrySize; i++)
-            {
-                for (int j = 0; j < arrySize; j++)
-                {
-                    
-                }
-
-            }
-
-            return newArry;
         }
     }
 }
