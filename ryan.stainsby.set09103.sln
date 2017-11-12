@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DraughtsFramework", "Draugh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DraughtsConsole", "DraughtsConsole\DraughtsConsole.csproj", "{D5606F9A-8752-4084-A3BF-9614AD28A64C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DraughtsGUI", "DraughtsGUI\DraughtsGUI.csproj", "{0CC9AE07-EBC7-40ED-82D5-A90D9E6CA52B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D5606F9A-8752-4084-A3BF-9614AD28A64C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5606F9A-8752-4084-A3BF-9614AD28A64C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5606F9A-8752-4084-A3BF-9614AD28A64C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CC9AE07-EBC7-40ED-82D5-A90D9E6CA52B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CC9AE07-EBC7-40ED-82D5-A90D9E6CA52B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CC9AE07-EBC7-40ED-82D5-A90D9E6CA52B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CC9AE07-EBC7-40ED-82D5-A90D9E6CA52B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
