@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DraughtsGame
+namespace DraughtsFramework
 {
-    class MoveLogger
+    public class MoveLogger
     {
         private LinkedList<Move> moveList;
 

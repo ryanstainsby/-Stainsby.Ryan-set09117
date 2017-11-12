@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DraughtsGame
+namespace DraughtsFramework
 {
-    class MoveNode
+    public class MoveNode
     {
         protected readonly List<MoveNode> _children = new List<MoveNode>();
         // The board state asssociated with this node

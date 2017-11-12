@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
  
-namespace DraughtsGame
+namespace DraughtsFramework
 {
-    class DraughtsAI
+    public class DraughtsAI
     {
         int? originalPlayer = null;
 

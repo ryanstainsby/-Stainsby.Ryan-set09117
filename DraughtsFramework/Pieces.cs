@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DraughtsGame
+namespace DraughtsFramework
 {
     public static class Pieces
     {
