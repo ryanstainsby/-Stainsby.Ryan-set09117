@@ -28,11 +28,18 @@ namespace DraughtsGame
 
         public void PrintLog()
         {
-            foreach (Move move in moveList)
+            if (moveList.Count == 0)
             {
-                Console.WriteLine(Environment.NewLine + "___Log___");
-                Console.WriteLine(move.XFrom + ", " + move.YFrom + " => " + move.XTo + ", " + move.YTo + Environment.NewLine);
-            }            
+                Console.WriteLine("No moves saved in log");
+            }
+            else
+            {
+                foreach (Move move in moveList)
+                {
+                    Console.WriteLine(Environment.NewLine + "___Log___");
+                    Console.WriteLine(move.XFrom + ", " + move.YFrom + " => " + move.XTo + ", " + move.YTo + Environment.NewLine);
+                }
+            }          
         }
 
         public Move GetLastMove()

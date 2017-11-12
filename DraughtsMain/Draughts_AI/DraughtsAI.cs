@@ -12,43 +12,117 @@ namespace DraughtsGame
         public Move GetBestMove(Board board, MoveNode prevMove, int player, int depth)
         {
             originalPlayer = player;
-            MoveNode nextMove = MoveTree(board, prevMove, player, depth);
+            MoveNode nextMove = BuildMoveTree(board, prevMove, player, depth);
+            
+            foreach (MoveNode child in nextMove.Children)
+            {
+                int alpha = -100;
+                int beta = +100;
+                child.Value = AlphaBeta(child, alpha, beta);
+            }
 
             var highestValues = nextMove.Children.GroupBy(x => x.Value).OrderByDescending(g => g.Key).First().ToArray();
+            if (highestValues[0].Value > 0)
+            {
+                int pause = 0;
+            }
             var random = new Random();
             MoveNode randomMove = highestValues[random.Next(highestValues.Count() - 1)];
             
             return (randomMove.Move);
         }
 
-        public MoveNode MoveTree(Board board, MoveNode prevMove, int player, int depth)
+        private int AlphaBeta(MoveNode node, int alpha, int beta)
+        {
+            int bestValue;
+
+            if (node.Children.Count == 0)
+            {
+                bestValue = node.Value;
+            }
+            else if (node.Move.Player == originalPlayer)
+            {
+                bestValue = alpha;
+
+                // Recurse for all children of node.
+                for (int i = 0; i < node.Children.Count; i++)
+                {
+                    var childValue = AlphaBeta(node.Children[i], bestValue, beta);
+                    bestValue = Math.Max(bestValue, childValue);
+                    if (beta <= bestValue)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                bestValue = beta;
+
+                // Recurse for all children of node.
+                for (int i = 0; i < node.Children.Count; i++)
+                {
+                    var childValue = AlphaBeta(node.Children[i], alpha, bestValue);
+                    bestValue = Math.Min(bestValue, childValue);
+                    if (bestValue <= alpha)
+                    {
+                        break;
+                    }
+                }
+            }
+            return bestValue;
+        }
+
+        private MoveNode BuildMoveTree(Board board, MoveNode prevMove, int player, int depth)
         {
             MoveNode currentPosition = prevMove ?? new MoveNode(board, prevMove?.Move ?? null, null);
 
             if (depth != 0)
             {
-                int bestMoveScore = player == originalPlayer.Value ? 0 : -100;
-
-                foreach (var move in FindAllLegalMoves(currentPosition, player))
+                if (currentPosition.Move != null && currentPosition.Move.SuccessiveMoves != null)
                 {
-                    MoveNode possibleMove = MoveTree(move.Board, move, player == 1 ? 2 : 1, depth - 1);
-
-                    if (possibleMove.Value > bestMoveScore)
+                    foreach (var move in currentPosition.Move.SuccessiveMoves)
                     {
-                        bestMoveScore = possibleMove.Value;
+                        MoveNode possibleMove = CheckAndValueMove(currentPosition, move, depth);
+
+                        if (possibleMove == null) continue;
+
+                        AddChildrenToNode(possibleMove);
                     }
-
-                    possibleMove.Parent = currentPosition;
-                    currentPosition.AddChild(possibleMove);
                 }
-
-                currentPosition.Value += bestMoveScore;
+                else
+                {
+                    foreach (var moveNode in FindAllLegalMoves(currentPosition, player, depth))
+                    {
+                        AddChildrenToNode(moveNode);
+                    }
+                }                
             }
 
             return currentPosition;
+
+            void AddChildrenToNode(MoveNode possibleMove)
+            {
+                if (possibleMove.Value != 100 || possibleMove.Value != -100)
+                {
+                    if (possibleMove.Move.SuccessiveMoves != null)
+                    {                        
+                        possibleMove = BuildMoveTree(possibleMove.Board, possibleMove, player, depth - 1);
+                        //currentPosition.AddChild(possibleSuccessiveMove);
+                    }
+                    else
+                    {
+                        possibleMove = BuildMoveTree(possibleMove.Board, possibleMove, player == 1 ? 2 : 1, depth - 1);
+                    }
+
+                    possibleMove.Parent = currentPosition;
+                }
+
+                currentPosition.AddChild(possibleMove);
+            }
         }
 
-        private List<MoveNode> FindAllLegalMoves(MoveNode parentNode, int player)
+        private List<MoveNode> FindAllLegalMoves(MoveNode parentNode, int player, int depth)
         {
             var moves = new List<MoveNode>();
 
@@ -58,94 +132,142 @@ namespace DraughtsGame
                 {
                     int piece = parentNode.Board.piecePositions[x, y];
 
-                    if (player == Pieces.Player_1 && (piece == Pieces.White_Man || piece == Pieces.White_King))
+                    if (player == 1 && (piece == Pieces.White_Man || piece == Pieces.White_King))
                     {
-                        CheckAndAddMove(x, y, x - 1, y + 1);
-                        CheckAndAddMove(x, y, x - 1, y - 1);
-                        CheckAndAddMove(x, y, x - 2, y + 2);
-                        CheckAndAddMove(x, y, x - 2, y - 2);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 1, y + 1), depth);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 1, y - 1), depth);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 2, y + 2), depth);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 2, y - 2), depth);
 
-                        if (piece == 3)
+                        if (piece == Pieces.White_King)
                         {
-                            CheckAndAddMove(x, y, x + 1, y + 1);
-                            CheckAndAddMove(x, y, x + 1, y - 1);
-                            CheckAndAddMove(x, y, x + 2, y + 2);
-                            CheckAndAddMove(x, y, x + 2, y - 2);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 1, y + 1), depth);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 1, y - 1), depth);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 2, y + 2), depth);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 2, y - 2), depth);
                         }
                     }
-                    else if (player == Pieces.Player_2 && (piece == Pieces.Black_Man || piece == Pieces.Black_King))
+                    else if (player == 2 && (piece == Pieces.Black_Man || piece == Pieces.Black_King))
                     {
-                        CheckAndAddMove(x, y, x + 1, y + 1);
-                        CheckAndAddMove(x, y, x + 1, y - 1);
-                        CheckAndAddMove(x, y, x + 2, y + 2);
-                        CheckAndAddMove(x, y, x + 2, y - 2);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 1, y + 1), depth);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 1, y - 1), depth);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 2, y + 2), depth);
+                        CheckAndValueMove(moves, parentNode, new Move(player, x, y, x + 2, y - 2), depth);
 
-                        if (piece == 4)
+                        if (piece == Pieces.Black_King)
                         {
-                            CheckAndAddMove(x, y, x - 1, y + 1);
-                            CheckAndAddMove(x, y, x - 1, y - 1);
-                            CheckAndAddMove(x, y, x - 2, y + 2);
-                            CheckAndAddMove(x, y, x - 2, y - 2);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 1, y + 1), depth);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 1, y - 1), depth);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 2, y + 2), depth);
+                            CheckAndValueMove(moves, parentNode, new Move(player, x, y, x - 2, y - 2), depth);
                         }
                     }
                 }
             }
 
             return moves;
+        }
 
-            void CheckAndAddMove(int xFrom, int yFrom, int xTo, int yTo)
+        private void CheckAndValueMove(List<MoveNode> moves, MoveNode parentNode, Move move, int depth)
+        {
+            Board copyBoard = new Board
             {
-                Board copyBoard = new Board
+                piecePositions = (int[,])parentNode.Board.piecePositions.Clone()
+            };
+
+            if (copyBoard.MakeMove(move))
+            {
+                var moveNode = new MoveNode(copyBoard, move, parentNode)
                 {
-                    piecePositions = (int[,])parentNode.Board.piecePositions.Clone()
+                    Value = GetMoveValue(copyBoard, move, depth)
                 };
 
-                Move move = new Move(xFrom, yFrom, xTo, yTo);               
-
-                if (copyBoard.MakeMove(player, move))
-                {
-                    int moveValue = 0;
-                    
-                    if (player == originalPlayer)
-                    {
-                        if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
-                        {
-                            moveValue += 8;
-                        }
-
-                        if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
-                        {
-                            moveValue += 5;
-                        }
-
-                        if (move.CreatedKing)
-                        {
-                            moveValue += 4;
-                        }
-                    }
-                    else
-                    {
-                        if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
-                        {
-                            moveValue -= 9;
-                        }
-
-                        if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
-                        {
-                            moveValue -= 6;
-                        }
-
-                        if (move.CreatedKing)
-                        {
-                            moveValue -= 4;
-                        }
-                    }
-
-                    var moveNode = new MoveNode(copyBoard, move, parentNode);
-                    moveNode.Value = moveValue;
-                    moves.Add(moveNode);
-                }
+                moves.Add(moveNode);
             }
+        }
+
+        private MoveNode CheckAndValueMove(MoveNode parentNode, Move move, int depth)
+        {
+            Board copyBoard = new Board
+            {
+                piecePositions = (int[,])parentNode.Board.piecePositions.Clone()
+            };
+
+            if (copyBoard.MakeMove(move))
+            {
+                return new MoveNode(copyBoard, move, parentNode)
+                {
+                    Value = GetMoveValue(copyBoard, move, depth)
+                };               
+            }
+
+            return null;
+        }
+
+        private int GetMoveValue(Board board, Move move, int depth)
+        {
+            int moveValue = 0;
+
+            if (move.Player == originalPlayer)
+            {                
+                if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
+                {
+                    moveValue += 6;
+                }
+
+                if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
+                {
+                    moveValue += 5;
+                }
+
+                if (move.CreatedKing)
+                {
+                    moveValue += 4;
+                }
+
+                if (Rules.CanTakeAnotherPiece(board.piecePositions, move))
+                {
+                    moveValue += 5;
+                }
+            
+                if (board.IsWinner())
+                {
+                    moveValue = 100;
+                }
+
+                moveValue += (depth * 2);
+            }
+            else
+            {
+                if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
+                {
+                    moveValue -= 6;
+                }
+
+                if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
+                {
+                    moveValue -= 4;
+                }
+
+                if (move.CreatedKing)
+                {
+                    moveValue -= 3;
+                }
+
+                if (Rules.CanTakeAnotherPiece(board.piecePositions, move))
+                {
+                    moveValue -= 5;
+                }
+
+                if (board.IsWinner())
+                {
+                    moveValue = -100;
+                }
+
+                moveValue += (depth * 2);
+            }
+
+            return moveValue;
         }
     }
 }

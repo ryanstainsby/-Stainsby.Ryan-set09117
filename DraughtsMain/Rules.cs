@@ -7,12 +7,12 @@ namespace DraughtsGame
     public static class Rules
     {
         // Players piece
-        public static bool IsPlayersPiece(int[,] board, int player, int piece)
+        public static bool IsPlayersPiece(int player, int piece)
         {
             bool playerOnes = piece == Pieces.White_Man || piece == Pieces.White_King;
             bool playerTwos = piece == Pieces.Black_Man || piece == Pieces.Black_King;
 
-            if ((player == Pieces.Player_1 && playerOnes) || (player == Pieces.Player_2 && playerTwos))
+            if ((player == 1 && playerOnes) || (player == 2 && playerTwos))
             {
                 return true;
             }
@@ -21,7 +21,7 @@ namespace DraughtsGame
         }
 
         // Moving diagonally
-        public static bool IsMovingDiagonally(int[,] board, int player, Move move)
+        public static bool IsMovingDiagonally(int[,] board, Move move)
         {
             bool isWhiteKing = move.Piece == Pieces.White_King;
             bool isBlackKing = move.Piece == Pieces.Black_King;
@@ -30,13 +30,13 @@ namespace DraughtsGame
             bool blackForward = (move.XTo == move.XFrom + 1 || (isBlackKing && move.XTo == move.XFrom - 1)) && (move.YTo == move.YFrom + 1 || move.YTo == move.YFrom - 1);
             bool blackTaking = (move.XTo == move.XFrom + 2 || (isBlackKing && move.XTo == move.XFrom - 2)) && (move.YTo == move.YFrom + 2 || move.YTo == move.YFrom - 2);
 
-            if (player == Pieces.Player_1)
+            if (move.Player == 1)
             {
-                return whiteForward || (whiteTaking && IsCapturingOpponent(Pieces.Player_2));
+                return whiteForward || (whiteTaking && IsCapturingOpponent(2));
             }
             else // Must be player 2
             {
-                return blackForward || (blackTaking && IsCapturingOpponent(Pieces.Player_1));
+                return blackForward || (blackTaking && IsCapturingOpponent(1));
             }
 
             bool IsCapturingOpponent(int opponent)
@@ -45,7 +45,7 @@ namespace DraughtsGame
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
                 int opponentsPiece = board[xSpaceMovedOver, ySpaceMovedOver];
 
-                if (IsPlayersPiece(board, opponent, opponentsPiece))
+                if (IsPlayersPiece(opponent, opponentsPiece))
                 {
                     move.PieceTaken = opponentsPiece;
                     return true;
@@ -58,10 +58,85 @@ namespace DraughtsGame
         // Piece is moving within the boundries of the board
         public static bool IsWithinBoard(Move move)
         {
-            return (move.XTo < 8 && move.XTo >= 0 && move.YTo < 8 && move.YTo >= 0);
+            return IsWithinBoard(move.XTo, move.YTo);
+        }
+
+        private static bool IsWithinBoard(int xTo, int yTo)
+        {
+            return (xTo < 8 && xTo >= 0 && yTo < 8 && yTo >= 0);
+        }
+
+        public static bool CanTakeAnotherPiece(int[,] board, Move move)
+        {
+            List<Move> nextMoves = new List<Move>();
+            
+            if (move.PieceTaken != 0)
+            {
+                CheckAndAddLeftMoves();
+                CheckAndAddRightMoves();
+            }
+
+            if (nextMoves.Count > 0)
+            {
+                move.SuccessiveMoves = nextMoves;
+                return true;
+            }
+                        
+            return false;
+
+
+            void CheckAndAddLeftMoves()
+            {
+                int newYTo = move.YTo - 2;
+
+                if (move.Piece == Pieces.White_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+                {
+                    int newXTo = move.XTo - 2;
+
+                    if (IsWithinBoard(newXTo, newYTo) && IsEmptySpace(board, newXTo, newYTo) && IsPlayersPiece(move.Player == 1 ? 2 : 1, board[newXTo + 1, newYTo + 1]))
+                    {
+                        nextMoves.Add(new Move(move.Player, move.XTo, move.YTo, newXTo, newYTo));
+                    }
+                }
+                else if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+                {
+                    int newXTo = move.XTo + 2;
+
+                    if (IsWithinBoard(newXTo, newYTo) && IsEmptySpace(board, newXTo, newYTo) && IsPlayersPiece(move.Player == 1 ? 2 : 1, board[newXTo - 1, newYTo + 1]))
+                    {
+                        nextMoves.Add(new Move(move.Player, move.XTo, move.YTo, newXTo, newYTo));
+                    }
+                }
+            }
+
+            void CheckAndAddRightMoves()
+            {
+                int newYTo = move.YTo + 2;
+
+                if (move.Piece == Pieces.White_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+                {
+                    int newXTo = move.XTo - 2;
+
+                    if (IsWithinBoard(newXTo, newYTo) && IsEmptySpace(board, newXTo, newYTo) && IsPlayersPiece(move.Player == 1 ? 2 : 1, board[newXTo + 1, newYTo - 1]))
+                    {
+                        nextMoves.Add(new Move(move.Player, move.XTo, move.YTo, newXTo, newYTo));
+                    }
+                }
+                else if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+                {
+                    int newXTo = move.XTo + 2;
+
+                    if (IsWithinBoard(newXTo, newYTo) && IsEmptySpace(board, newXTo, newYTo) && IsPlayersPiece(move.Player == 1 ? 2 : 1, board[newXTo - 1, newYTo - 1]))
+                    {
+                        nextMoves.Add(new Move(move.Player, move.XTo, move.YTo, newXTo, newYTo));
+                    }
+                }
+            }
         }
 
         // Space is empty
-        public static bool IsEmptySpace(int[,] board, Move move) => board[move.XTo, move.YTo] == Pieces.Empty;
+        public static bool IsEmptySpace(int[,] board, Move move) => IsEmptySpace(board, move.XTo, move.YTo);
+
+        private static bool IsEmptySpace(int[,] board, int xTo, int yTo) => board[xTo, yTo] == Pieces.Empty;
     }
 }
