@@ -41,7 +41,7 @@ namespace DraughtsConsole
 
                 if (cmd == "print log")
                 {
-                    logger.PrintLog();
+                    ConsoleHelper.PrintLog(logger);
                     cmd = Console.ReadLine();
                 }
                 else if (cmd == "undo")
@@ -107,7 +107,7 @@ namespace DraughtsConsole
                 int xTo = int.Parse(cmd.Substring(4, 1));
                 string yTo = cmd.Substring(3, 1);
 
-                Move move = board.GenerateMoveFromUserInput(player, xFrom, yFrom, xTo, yTo);
+                Move move = ConsoleHelper.GenerateMoveFromUserInput(player, xFrom, yFrom, xTo, yTo);
 
                 if (IsPermittedMove(move) && board.MakeMove(move))
                 {
@@ -144,8 +144,9 @@ namespace DraughtsConsole
             void PrintBoardAndMessage()
             {
                 Console.Clear();
-                board.PrintBoard();
+                ConsoleHelper.PrintBoard(board);
                 Console.WriteLine(message);
+                ConsoleHelper.PrintLog(logger);
                 cmd = Console.ReadLine();
             }
 

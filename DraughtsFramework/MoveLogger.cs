@@ -26,20 +26,9 @@ namespace DraughtsFramework
             return move;
         }
 
-        public void PrintLog()
+        public LinkedList<Move> GetFullLog()
         {
-            if (moveList.Count == 0)
-            {
-                Console.WriteLine("No moves saved in log");
-            }
-            else
-            {
-                foreach (Move move in moveList)
-                {
-                    Console.WriteLine(Environment.NewLine + "___Log___");
-                    Console.WriteLine(move.XFrom + ", " + move.YFrom + " => " + move.XTo + ", " + move.YTo + Environment.NewLine);
-                }
-            }          
+            return moveList;
         }
 
         public Move GetLastMove()

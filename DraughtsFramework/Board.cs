@@ -22,62 +22,7 @@ namespace DraughtsFramework
                                          { 1, 0, 1, 0, 1, 0, 1, 0 },
                                          { 0, 1, 0, 1, 0, 1, 0, 1 },
                                          { 1, 0, 1, 0, 0, 0, 1, 0 } };
-        }
-
-        public void PrintBoard()
-        {
-            int printCount = 1;
-            int rowNum = 8;
-
-            foreach (var item in piecePositions)
-            {
-                string piece = "--";
-
-                switch (item)
-                {
-                    case 1:
-                        piece = "WP";
-                        break;
-                    case 2:
-                        piece = "BP";
-                        break;
-                    case 3:
-                        piece = "WK";
-                        break;
-                    case 4:
-                        piece = "BK";
-                        break;                    
-                }
-
-
-                if (printCount == 1)
-                {
-                    Console.Write(rowNum + "| ");
-                    rowNum--;
-                }
-
-                if (printCount % 8 == 0)
-                {
-                    Console.WriteLine(piece);
-                    Console.WriteLine(" |");
-                }
-                else
-                {
-                    Console.Write(piece + " ");
-                }
-
-                if (printCount % 8 == 0 && printCount < 64)
-                {
-                    Console.Write(rowNum + "| ");
-                    rowNum--;
-                }
-
-                printCount++;
-            }
-
-            Console.WriteLine("  ------------------------");
-            Console.WriteLine("   A  B  C  D  E  F  G  H");
-        }
+        }        
 
         public bool MakeMove(Move move)
         {
@@ -129,44 +74,6 @@ namespace DraughtsFramework
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
                 piecePositions[xSpaceMovedOver, ySpaceMovedOver] = move.PieceTaken;
-            }
-        }
-
-        /// <summary>
-        /// Converts user input into array positions and returns a move
-        /// </summary>
-        public Move GenerateMoveFromUserInput(int player, int xFrom, string yFrom, int xTo, string yTo)
-        {
-            int newXFrom = SwitchPositions(xFrom);
-            int newYFrom = ((yFrom.ToLower().ToCharArray()[0])) - 97;  
-            int newXTo = SwitchPositions(xTo);
-            int newYTo = ((yTo.ToLower().ToCharArray()[0])) - 97;
-
-            return new Move(player, newXFrom, newYFrom, newXTo, newYTo);
-
-            int SwitchPositions(int x)
-            {
-                switch(x)
-                {
-                    case 1:
-                        return 7;
-                    case 2:
-                        return 6;
-                    case 3:
-                        return 5;
-                    case 4:
-                        return 4;
-                    case 5:
-                        return 3;
-                    case 6:
-                        return 2;
-                    case 7:
-                        return 1;
-                    case 8:
-                        return 0;
-                    default:
-                        return 0;
-                }
             }
         }
 
