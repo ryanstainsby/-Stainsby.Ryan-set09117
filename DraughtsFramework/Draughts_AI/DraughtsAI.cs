@@ -22,10 +22,6 @@ namespace DraughtsFramework
             }
 
             var highestValues = nextMove.Children.GroupBy(x => x.Value).OrderByDescending(g => g.Key).First().ToArray();
-            if (highestValues[0].Value > 0)
-            {
-                int pause = 0;
-            }
             var random = new Random();
             MoveNode randomMove = highestValues[random.Next(highestValues.Count() - 1)];
             
@@ -54,6 +50,11 @@ namespace DraughtsFramework
                         break;
                     }
                 }
+
+                if (bestValue > node.Value)
+                {
+                    return bestValue;
+                }
             }
             else
             {
@@ -69,8 +70,14 @@ namespace DraughtsFramework
                         break;
                     }
                 }
+
+                if (bestValue < node.Value)
+                {
+                    return bestValue;
+                }
             }
-            return bestValue;
+
+            return node.Value;
         }
 
         private MoveNode BuildMoveTree(Board board, MoveNode prevMove, int player, int depth)
@@ -108,7 +115,6 @@ namespace DraughtsFramework
                     if (possibleMove.Move.SuccessiveMoves != null)
                     {                        
                         possibleMove = BuildMoveTree(possibleMove.Board, possibleMove, player, depth - 1);
-                        //currentPosition.AddChild(possibleSuccessiveMove);
                     }
                     else
                     {
@@ -130,7 +136,7 @@ namespace DraughtsFramework
             {
                 for (int y = 0; y < 8; y++)
                 {
-                    int piece = parentNode.Board.piecePositions[x, y];
+                    int piece = parentNode.Board.piecePositions[x, y];                    
 
                     if (player == 1 && (piece == Pieces.White_Man || piece == Pieces.White_King))
                     {
@@ -207,65 +213,31 @@ namespace DraughtsFramework
         private int GetMoveValue(Board board, Move move, int depth)
         {
             int moveValue = 0;
-
-            if (move.Player == originalPlayer)
-            {                
-                if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
-                {
-                    moveValue += 6;
-                }
-
-                if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
-                {
-                    moveValue += 5;
-                }
-
-                if (move.CreatedKing)
-                {
-                    moveValue += 4;
-                }
-
-                if (Rules.CanTakeAnotherPiece(board.piecePositions, move))
-                {
-                    moveValue += 5;
-                }
             
-                if (board.IsWinner())
-                {
-                    moveValue = 100;
-                }
-
-                moveValue += (depth * 2);
-            }
-            else
+            if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
             {
-                if (move.PieceTaken == Pieces.White_King || move.PieceTaken == Pieces.Black_King)
-                {
-                    moveValue -= 6;
-                }
-
-                if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
-                {
-                    moveValue -= 4;
-                }
-
-                if (move.CreatedKing)
-                {
-                    moveValue -= 3;
-                }
-
-                if (Rules.CanTakeAnotherPiece(board.piecePositions, move))
-                {
-                    moveValue -= 5;
-                }
-
-                if (board.IsWinner())
-                {
-                    moveValue = -100;
-                }
-
-                moveValue += (depth * 2);
+                moveValue += 12;
             }
+            else if (move.PieceTaken == Pieces.White_Man || move.PieceTaken == Pieces.Black_Man)
+            {
+                moveValue += 10;
+            }
+
+            if (move.CreatedKing)
+            {
+                moveValue += 4;
+            }
+
+            if (Rules.CanTakeAnotherPiece(board.piecePositions, move))
+            {
+                moveValue += 2;
+            }
+            else if (board.IsWinner())
+            {
+                moveValue = 100;
+            }
+
+            moveValue = moveValue * (depth);
 
             return moveValue;
         }

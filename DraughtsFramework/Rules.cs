@@ -98,7 +98,8 @@ namespace DraughtsFramework
                         nextMoves.Add(new Move(move.Player, move.XTo, move.YTo, newXTo, newYTo));
                     }
                 }
-                else if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+
+                if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
                 {
                     int newXTo = move.XTo + 2;
 
@@ -122,7 +123,8 @@ namespace DraughtsFramework
                         nextMoves.Add(new Move(move.Player, move.XTo, move.YTo, newXTo, newYTo));
                     }
                 }
-                else if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+
+                if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
                 {
                     int newXTo = move.XTo + 2;
 

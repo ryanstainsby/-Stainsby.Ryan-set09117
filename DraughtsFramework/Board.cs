@@ -9,19 +9,18 @@ namespace DraughtsFramework
     {    
         // Represents all the positions on the board
         public int[,] piecePositions = new int[8,8];
-        string errorMessage = null;
 
         public Board()
         {
             // A new board with all pieces in their original positions
             piecePositions = new int[,]{ { 0, 2, 0, 2, 0, 2, 0, 2 },
                                          { 2, 0, 2, 0, 2, 0, 2, 0 },
-                                         { 0, 2, 0, 0, 0, 2, 0, 2 },
-                                         { 0, 0, 0, 0, 2, 0, 0, 0 },
+                                         { 0, 2, 0, 2, 0, 2, 0, 2 },
+                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
                                          { 0, 0, 0, 0, 0, 0, 0, 0 },
                                          { 1, 0, 1, 0, 1, 0, 1, 0 },
                                          { 0, 1, 0, 1, 0, 1, 0, 1 },
-                                         { 1, 0, 1, 0, 0, 0, 1, 0 } };
+                                         { 1, 0, 1, 0, 1, 0, 1, 0 } };
         }        
 
         public bool MakeMove(Move move)
@@ -47,11 +46,13 @@ namespace DraughtsFramework
                     piecePositions[move.XTo, move.YTo] = move.Piece;
                 }
 
+                // Check if a piece has been taken and change it's positions value to empty
                 if (move.PieceTaken != 0)
                 {
                     int xSpaceMovedOver = move.XTo > move.XFrom ? move.XFrom + 1 : move.XFrom - 1;
                     int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
-                    piecePositions[xSpaceMovedOver, ySpaceMovedOver] = 0;                    
+
+                    piecePositions[xSpaceMovedOver, ySpaceMovedOver] = 0;                      
                 }
 
                 piecePositions[move.XFrom, move.YFrom] = 0;
@@ -62,6 +63,10 @@ namespace DraughtsFramework
             return false;
         }
 
+        /// <summary>
+        /// Undo a move
+        /// </summary>
+        /// <param name="move">Move to undo</param>
         public void UndoMove(Move move)
         {            
             piecePositions[move.XFrom, move.YFrom] = move.Piece;
@@ -77,6 +82,9 @@ namespace DraughtsFramework
             }
         }
 
+        /// <summary>
+        /// Returns whether or not winning conditions have been met
+        /// </summary>
         public bool IsWinner()
         {
             bool noWhitePieces = !piecePositions.OfType<int>().Contains(Pieces.White_Man) && !piecePositions.OfType<int>().Contains(Pieces.White_King);
