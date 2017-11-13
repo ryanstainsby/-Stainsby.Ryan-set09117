@@ -16,11 +16,11 @@ namespace DraughtsFramework
             piecePositions = new int[,]{ { 0, 2, 0, 2, 0, 2, 0, 2 },
                                          { 2, 0, 2, 0, 2, 0, 2, 0 },
                                          { 0, 2, 0, 2, 0, 2, 0, 2 },
-                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
-                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
-                                         { 1, 0, 1, 0, 1, 0, 1, 0 },
+                                         { 0, 0, 2, 0, 0, 0, 0, 0 },
+                                         { 0, 1, 0, 0, 0, 0, 0, 0 },
+                                         { 0, 0, 1, 0, 1, 0, 1, 0 },
                                          { 0, 1, 0, 1, 0, 1, 0, 1 },
-                                         { 1, 0, 1, 0, 1, 0, 1, 0 } };
+                                         { 1, 0, 0, 0, 1, 0, 1, 0 } };
         }        
 
         public bool MakeMove(Move move)
@@ -56,7 +56,10 @@ namespace DraughtsFramework
                 }
 
                 piecePositions[move.XFrom, move.YFrom] = 0;
-                
+
+                // Assign successive takes if there are any
+                Rules.CanTakeAnotherPiece(piecePositions, move);
+
                 return true;
             }
 
@@ -79,7 +82,35 @@ namespace DraughtsFramework
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
                 piecePositions[xSpaceMovedOver, ySpaceMovedOver] = move.PieceTaken;
+            }           
+        }
+
+        /// <summary>
+        /// Redo a move
+        /// </summary>
+        /// <param name="move"></param>
+        public void RedoMove(Move move)
+        {
+            piecePositions[move.XFrom, move.YFrom] = Pieces.Empty;
+
+            // Make piece king
+            if (move.CreatedKing)
+            {
+                piecePositions[move.XTo, move.YTo] = move.Piece == Pieces.White_Man ? Pieces.White_King : Pieces.Black_King;
             }
+            else
+            {
+                piecePositions[move.XTo, move.YTo] = move.Piece;
+            }
+
+            // If move involved capturing
+            if (move.XTo == move.XFrom + 2 || move.XTo == move.XFrom - 2)
+            {
+                int xSpaceMovedOver = move.XTo > move.XFrom ? move.XFrom + 1 : move.XFrom - 1;
+                int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
+
+                piecePositions[xSpaceMovedOver, ySpaceMovedOver] = Pieces.Empty;
+            }            
         }
 
         /// <summary>

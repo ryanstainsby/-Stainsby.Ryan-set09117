@@ -39,20 +39,9 @@ namespace DraughtsConsole
             {
                 PrintBoardAndMessage();
 
-                if (board.IsWinner())
+                if (cmd == "undo")
                 {
-                    cmd = "0";
-                    Console.ReadKey();
-                }
-
-                if (cmd == "print log")
-                {
-                    ConsoleHelper.PrintLog(logger);
-                    cmd = Console.ReadLine();
-                }
-                else if (cmd == "undo")
-                {
-                    if (logger.IsEmpty())
+                    if (logger.UndoLogIsEmpty())
                     {
                         message = "No moves to undo\n" + message;
                     }
@@ -65,36 +54,25 @@ namespace DraughtsConsole
                             PrintBoardAndMessage();
                         }
 
-                        Move prevMove = logger.GetLastMove();
+                        AssignValuesAfterMove();
+                    }
+                }
+                else if (cmd == "redo")
+                {
+                    if (logger.RedoLogIsEmpty())
+                    {
+                        message = "No moves to redo\n" + message;
+                    }
+                    else
+                    {
+                        while (cmd == "redo")
+                        {
+                            board.RedoMove(logger.RedoMove());
+                            message = "To redo further type 'redo' else hit enter";
+                            PrintBoardAndMessage();
+                        }
 
-                        if (prevMove != null)
-                        {
-                            if (prevMove.SuccessiveMoves != null && prevMove.SuccessiveMoves.Count > 0)
-                            {
-                                player = prevMove.Player;
-                            }
-                            else
-                            {
-                                player = prevMove.Player == 1 ? 2 : 1;
-                            }                            
-                        }
-                        else
-                        {
-                            player = 1;
-                        }
-
-                        if (gameMode == 1 || (gameMode == 2 && player == 1))
-                        {
-                            message = $"Player {player} please make another capturing move, otherwise press enter to continue";
-                        }
-                        else if (gameMode == 2 && player == 2)
-                        {
-                            message = $"Press enter for opponent to make move";
-                        }
-                        else if (gameMode == 3)
-                        {
-                            message = "Press enter to make a move";
-                        }
+                        AssignValuesAfterMove();
                     }
                 }
                 else if (gameMode == 1)
@@ -102,10 +80,14 @@ namespace DraughtsConsole
                     if (logger.GetLastMove() != null && logger.GetLastMove().Player == player && logger.GetLastMove().SuccessiveMoves != null && cmd == string.Empty)
                     {
                         SwitchPlayer();
+                        message = $"Player {player} please make a move (Example move: A3,B4)";
                     }
                     else if (IsInMoveFormat(cmd))
                     {
-                        MakeHumanMove($"Player {player} please make a move (Example move: A3,B4)");
+                        if (MakeHumanMove($"Player {player} please make a move (Example move: A3,B4)"))
+                        {
+                            AssignValuesAfterMove();
+                        }
                     }
                     else
                     {
@@ -119,10 +101,11 @@ namespace DraughtsConsole
                         if (logger.GetLastMove() != null && logger.GetLastMove().Player == player && logger.GetLastMove().SuccessiveMoves != null && cmd == string.Empty)
                         {
                             SwitchPlayer();
+                            message = "Press enter for opponent to make move";
                         }
-                        else if (IsInMoveFormat(cmd))
+                        else if (IsInMoveFormat(cmd) && MakeHumanMove("Press enter for opponent to make move"))
                         {
-                            MakeHumanMove("Press enter for opponent to make move");
+                            AssignValuesAfterMove();
                         }
                         else
                         {
@@ -140,27 +123,19 @@ namespace DraughtsConsole
                 }
             }
 
-            void MakeHumanMove(string messageToDisplay)
+            bool MakeHumanMove(string messageToDisplay)
             {
                 Move move = ConsoleHelper.GenerateMoveFromUserInput(player, cmd);
 
                 if (IsPermittedMove(move) && board.MakeMove(move))
                 {
                     logger.AddMove(move);
-
-                    if (Rules.CanTakeAnotherPiece(board.piecePositions, move))
-                    {
-                        message = $"Player {player} please make another capturing move, otherwise press enter to continue";
-                    }
-                    else
-                    {
-                        SwitchPlayer();
-                        message = board.IsWinner() ? $"Player {player} wins!" : messageToDisplay;
-                    }
+                    return true;
                 }
                 else
                 {
                     message = $"That move is not legal, player {player} please try another move";
+                    return false;
                 }
             }
 
@@ -168,13 +143,7 @@ namespace DraughtsConsole
             {
                 Move move = ai.GetBestMove(board, new MoveNode(board, logger.GetLastMove()), player, 5);
                 board.MakeMove(move);
-                logger.AddMove(move);
-                message = board.IsWinner() ? $"Player {player} wins!" : messageToDisplay;
-
-                if (logger.GetLastMove()?.SuccessiveMoves == null)
-                {
-                    SwitchPlayer();
-                }               
+                logger.AddMove(move);  
             }
 
             void PrintBoardAndMessage()
@@ -193,7 +162,10 @@ namespace DraughtsConsole
 
             bool IsPermittedMove(Move move)
             {
-                if (move.SuccessiveMoves == null) return true;
+                if (move.SuccessiveMoves == null)
+                {
+                    return true;
+                }
 
                 foreach (Move m in move.SuccessiveMoves)
                 {
@@ -204,6 +176,53 @@ namespace DraughtsConsole
                 }
 
                 return false;
+            }
+
+            void AssignValuesAfterMove()
+            {
+                if (board.IsWinner())
+                {
+                    message = $"Player {player} wins";
+                }
+                else
+                {
+                    Move prevMove = logger.GetLastMove();
+
+                    if (prevMove != null)
+                    {
+                        if (prevMove.SuccessiveMoves != null && prevMove.SuccessiveMoves.Count > 0)
+                        {
+                            player = prevMove.Player;
+                            message = Message(true);
+                        }
+                        else
+                        {
+                            player = prevMove.Player == 1 ? 2 : 1;
+                            message = Message();
+                        }
+                    }
+                    else
+                    {
+                        player = 1;
+                        message = Message();
+                    }
+                }          
+                
+                string Message(bool successive = false)
+                {
+                    if (gameMode == 1 || (gameMode == 2 && player == 1))
+                    {
+                        return successive ? $"Player {player} please make another capturing move, otherwise press enter to continue" : $"Player {player} please make a move (Example move: A3,B4)";
+                    }
+                    else if (gameMode == 2 && player == 2)
+                    {
+                        return "Press enter for opponent to make move";
+                    }
+                    else
+                    {
+                        return "Press enter to make a move";
+                    }
+                }
             }
         }
 

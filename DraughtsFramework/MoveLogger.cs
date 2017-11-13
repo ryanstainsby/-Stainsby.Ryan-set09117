@@ -5,37 +5,51 @@ namespace DraughtsFramework
 {
     public class MoveLogger
     {
-        private LinkedList<Move> moveList;
+        private LinkedList<Move> undoList;
+        private LinkedList<Move> redoList;
 
         public MoveLogger()
         {
-            moveList = new LinkedList<Move>();
+            undoList = new LinkedList<Move>();
+            redoList = new LinkedList<Move>();
         }
 
         public void AddMove(Move move)
         { 
-            moveList.AddFirst(move);
+            undoList.AddFirst(move);
+            redoList.Clear();
         }
 
         public Move UndoMove()
         {
-            Move move = moveList.First.Value;
+            Move move = undoList.First.Value;
 
-            moveList.RemoveFirst();
+            undoList.RemoveFirst();
+            redoList.AddFirst(move);
+
+            return move;
+        }
+
+        public Move RedoMove()
+        {
+            Move move = redoList.First.Value;
+
+            redoList.RemoveFirst();
+            undoList.AddFirst(move);
 
             return move;
         }
 
         public LinkedList<Move> GetFullLog()
         {
-            return moveList;
+            return undoList;
         }
 
         public Move GetLastMove()
         {
-            if (moveList.Count > 0)
+            if (undoList.Count > 0)
             {
-                return moveList.First.Value;
+                return undoList.First.Value;
             }
             else
             {
@@ -43,9 +57,14 @@ namespace DraughtsFramework
             }
         }
 
-        public bool IsEmpty()
+        public bool UndoLogIsEmpty()
         {
-            return moveList.Count == 0;
+            return undoList.Count == 0;
+        }
+
+        public bool RedoLogIsEmpty()
+        {
+            return redoList.Count == 0;
         }
     }
 }
