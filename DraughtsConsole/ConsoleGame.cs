@@ -19,12 +19,13 @@ namespace DraughtsConsole
                              "1 = Player vs Player\n" +
                              "2 = Player vs AI\n" +
                              "3 = AI vs AI\n" +
+                             "4 - Replay Last Game\n" +
                              "0 = Exit";
 
             Console.WriteLine(message);
             cmd = Console.ReadLine();
 
-            while (cmd.Length != 1 || !System.Text.RegularExpressions.Regex.IsMatch(cmd, "[0-3]"))
+            while (cmd.Length != 1 || !System.Text.RegularExpressions.Regex.IsMatch(cmd, "[0-4]"))
             {
                 Console.Clear();
                 Console.WriteLine(message);
@@ -34,6 +35,37 @@ namespace DraughtsConsole
 
             gameMode = Int32.Parse(cmd);
             message = gameMode != 3 ? $"Player {player} please make a move? (Example move: A3,B4)" : "Press enter to make move";
+
+            if (cmd == "4")
+            {
+                logger.LoadGame();
+
+                message = "Press enter to continue or type 'undo' to go back a turn";
+
+                while (!logger.RedoLogIsEmpty())
+                {
+                    if (cmd == "undo")
+                    {
+                        board.UndoMove(logger.UndoMove());
+                    }
+                    else
+                    {
+                        board.RedoMove(logger.RedoMove());
+                    }
+
+                    if (logger.RedoLogIsEmpty())
+                    {
+                        message = "Game finished, press enter to exit";
+                    }
+
+                    PrintBoardAndMessage();
+
+                    if (cmd == "0")
+                    {
+                        break;
+                    }
+                }                
+            }
 
             while (cmd != "0")
             {
@@ -183,7 +215,8 @@ namespace DraughtsConsole
             {
                 if (board.IsWinner())
                 {
-                    message = $"Player {player} wins";
+                    message = $"Player {player} wins press enter to exit";
+                    logger.SaveGame();
                 }
                 else
                 {

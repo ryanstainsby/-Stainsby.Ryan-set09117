@@ -1,46 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace DraughtsFramework
 {
     public class MoveLogger
     {
-        private LinkedList<Move> undoList;
-        private LinkedList<Move> redoList;
+        private Stack<Move> undoList;
+        private Stack<Move> redoList;
 
         public MoveLogger()
         {
-            undoList = new LinkedList<Move>();
-            redoList = new LinkedList<Move>();
+            undoList = new Stack<Move>();
+            redoList = new Stack<Move>();
         }
 
         public void AddMove(Move move)
         { 
-            undoList.AddFirst(move);
+            undoList.Push(move);
             redoList.Clear();
         }
 
         public Move UndoMove()
         {
-            Move move = undoList.First.Value;
+            Move move = undoList.Pop();
 
-            undoList.RemoveFirst();
-            redoList.AddFirst(move);
+            redoList.Push(move);
 
             return move;
         }
 
         public Move RedoMove()
         {
-            Move move = redoList.First.Value;
+            Move move = redoList.Pop();
 
-            redoList.RemoveFirst();
-            undoList.AddFirst(move);
+            undoList.Push(move);
 
             return move;
         }
 
-        public LinkedList<Move> GetFullLog()
+        public Stack<Move> GetFullLog()
         {
             return undoList;
         }
@@ -49,7 +48,7 @@ namespace DraughtsFramework
         {
             if (undoList.Count > 0)
             {
-                return undoList.First.Value;
+                return undoList.Peek();
             }
             else
             {
@@ -65,6 +64,23 @@ namespace DraughtsFramework
         public bool RedoLogIsEmpty()
         {
             return redoList.Count == 0;
+        }
+
+        public void SaveGame()
+        {          
+            
+
+            File.WriteAllText("saved_game.json", Environment.NewLine + Newtonsoft.Json.JsonConvert.SerializeObject(undoList));                            
+        }
+
+        public void LoadGame()
+        {
+            redoList = Newtonsoft.Json.JsonConvert.DeserializeObject<Stack<Move>>(File.ReadAllText("saved_game.json"));
+        }
+
+        public Move ReplayMove()
+        {
+            return redoList.Pop();
         }
     }
 }
