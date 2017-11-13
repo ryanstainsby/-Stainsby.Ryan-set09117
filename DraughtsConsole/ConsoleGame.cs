@@ -120,6 +120,7 @@ namespace DraughtsConsole
                 else if (gameMode == 3)
                 {
                     MakeAiMove("Press enter to make a move");
+                    AssignValuesAfterMove();
                 }
             }
 
