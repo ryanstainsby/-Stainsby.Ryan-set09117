@@ -3,6 +3,9 @@ using DraughtsFramework;
 
 namespace DraughtsConsole
 {
+    /// <summary>
+    /// Helper class for writing to a receiving commands from the console
+    /// </summary>
     public static class ConsoleHelper
     {
         /// <summary>
@@ -48,6 +51,10 @@ namespace DraughtsConsole
             }
         }
 
+        /// <summary>
+        /// Prints the board with current positions
+        /// </summary>
+        /// <param name="board">The board to be printed</param>
         public static void PrintBoard(Board board)
         {
             int printCount = 1;
@@ -103,6 +110,10 @@ namespace DraughtsConsole
             Console.WriteLine("   A  B  C  D  E  F  G  H");
         }
 
+        /// <summary>
+        /// Prints the move log at the right hand side of the board
+        /// </summary>
+        /// <param name="logger">The log to be printed</param>
         public static void PrintLog(MoveLogger logger)
         {
             string title = "___Log___";
@@ -137,6 +148,7 @@ namespace DraughtsConsole
 
             Console.SetCursorPosition(0, 19);
 
+            // Convert log entry into a move format that the user can understand
             string GenerateLogEntryFromMove(Move move)
             {
                 string from = Convert.ToChar(move.YFrom + 97).ToString() + SwitchPositions(move.XFrom);

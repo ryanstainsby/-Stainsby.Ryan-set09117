@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DraughtsFramework
+﻿namespace DraughtsFramework
 {
+    /// <summary>
+    /// All values associated with piece types
+    /// </summary>
     public static class Pieces
     {
         public const int Empty = 0;

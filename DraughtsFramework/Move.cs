@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DraughtsFramework
 {    
+    /// <summary>
+    /// Stores all relative information about a move
+    /// </summary>
     public class Move
     {
         private int _player;

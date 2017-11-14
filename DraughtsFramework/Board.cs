@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace DraughtsFramework
 {
     public class Board
     {    
-        // Represents all the positions on the board
+        // Represents all the positions on the board and the pieces within each
         public int[,] piecePositions = new int[8,8];
+        public int whitePieces = 12;
+        public int blackPieces = 12;
 
         public Board()
         {
@@ -16,13 +15,18 @@ namespace DraughtsFramework
             piecePositions = new int[,]{ { 0, 2, 0, 2, 0, 2, 0, 2 },
                                          { 2, 0, 2, 0, 2, 0, 2, 0 },
                                          { 0, 2, 0, 2, 0, 2, 0, 2 },
-                                         { 0, 0, 2, 0, 0, 0, 0, 0 },
-                                         { 0, 1, 0, 0, 0, 0, 0, 0 },
-                                         { 0, 0, 1, 0, 1, 0, 1, 0 },
+                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                         { 0, 0, 0, 0, 0, 0, 0, 0 },
+                                         { 1, 0, 1, 0, 1, 0, 1, 0 },
                                          { 0, 1, 0, 1, 0, 1, 0, 1 },
-                                         { 1, 0, 0, 0, 1, 0, 1, 0 } };
+                                         { 1, 0, 1, 0, 1, 0, 1, 0 } };
         }        
 
+        /// <summary>
+        /// Checks move is legal and applies it to board
+        /// </summary>
+        /// <param name="move">The move to be made</param>
+        /// <returns></returns>
         public bool MakeMove(Move move)
         {
             // Assign the piece being moved to the move
@@ -52,7 +56,19 @@ namespace DraughtsFramework
                     int xSpaceMovedOver = move.XTo > move.XFrom ? move.XFrom + 1 : move.XFrom - 1;
                     int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
-                    piecePositions[xSpaceMovedOver, ySpaceMovedOver] = 0;                      
+                    piecePositions[xSpaceMovedOver, ySpaceMovedOver] = 0;           
+                    
+                    switch (move.PieceTaken)
+                    {
+                        case Pieces.White_King:
+                        case Pieces.White_Man:
+                            whitePieces--;
+                            break;
+                        case Pieces.Black_King:
+                        case Pieces.Black_Man:
+                            blackPieces--;
+                            break;
+                    }
                 }
 
                 piecePositions[move.XFrom, move.YFrom] = 0;
@@ -82,13 +98,25 @@ namespace DraughtsFramework
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
                 piecePositions[xSpaceMovedOver, ySpaceMovedOver] = move.PieceTaken;
+
+                switch (move.PieceTaken)
+                {
+                    case Pieces.White_King:
+                    case Pieces.White_Man:
+                        whitePieces++;
+                        break;
+                    case Pieces.Black_King:
+                    case Pieces.Black_Man:
+                        blackPieces++;
+                        break;
+                }
             }           
         }
 
         /// <summary>
         /// Redo a move
         /// </summary>
-        /// <param name="move"></param>
+        /// <param name="move">Move to redo</param>
         public void RedoMove(Move move)
         {
             piecePositions[move.XFrom, move.YFrom] = Pieces.Empty;
@@ -110,6 +138,18 @@ namespace DraughtsFramework
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
                 piecePositions[xSpaceMovedOver, ySpaceMovedOver] = Pieces.Empty;
+
+                switch (move.PieceTaken)
+                {
+                    case Pieces.White_King:
+                    case Pieces.White_Man:
+                        whitePieces--;
+                        break;
+                    case Pieces.Black_King:
+                    case Pieces.Black_Man:
+                        blackPieces--;
+                        break;
+                }
             }            
         }
 

@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DraughtsFramework
 {
     public static class Rules
     {
-        // Players piece
+        /// <summary>
+        /// Checks if the piece being moved is a players piece
+        /// </summary>
+        /// <param name="player">Player to check</param>
+        /// <param name="piece">Piece to check</param>
+        /// <returns></returns>
         public static bool IsPlayersPiece(int player, int piece)
         {
             bool playerOnes = piece == Pieces.White_Man || piece == Pieces.White_King;
@@ -20,7 +23,12 @@ namespace DraughtsFramework
             return false;
         }
 
-        // Moving diagonally
+        /// <summary>
+        /// Checks if the piece is moving diagonally
+        /// </summary>
+        /// <param name="board">Board positions to check against</param>
+        /// <param name="move">Move to check</param>
+        /// <returns></returns>
         public static bool IsMovingDiagonally(int[,] board, Move move)
         {
             bool isWhiteKing = move.Piece == Pieces.White_King;
@@ -55,17 +63,33 @@ namespace DraughtsFramework
             }
         }
 
-        // Piece is moving within the boundries of the board
+        /// <summary>
+        /// Checks if the move being made is within the boundries of the board
+        /// </summary>
+        /// <param name="move">Move to check</param>
+        /// <returns></returns>
         public static bool IsWithinBoard(Move move)
         {
             return IsWithinBoard(move.XTo, move.YTo);
         }
 
+        /// <summary>
+        /// Checks if the move being made is within the boundries of the board
+        /// </summary>
+        /// <param name="xTo">X Position to check</param>
+        /// <param name="yTo">Y Position to check</param>
+        /// <returns></returns>
         private static bool IsWithinBoard(int xTo, int yTo)
         {
             return (xTo < 8 && xTo >= 0 && yTo < 8 && yTo >= 0);
         }
 
+        /// <summary>
+        /// Checks if the piece being moved can make another successive take and adds those moves to it's successive moves list
+        /// </summary>
+        /// <param name="board">Board to check against</param>
+        /// <param name="move">Move to check</param>
+        /// <returns></returns>
         public static bool CanTakeAnotherPiece(int[,] board, Move move)
         {
             List<Move> nextMoves = new List<Move>();
@@ -89,7 +113,7 @@ namespace DraughtsFramework
             {
                 int newYTo = move.YTo - 2;
 
-                if (move.Piece == Pieces.White_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+                if (move.Piece == Pieces.White_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King || move.CreatedKing)
                 {
                     int newXTo = move.XTo - 2;
 
@@ -99,7 +123,7 @@ namespace DraughtsFramework
                     }
                 }
 
-                if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
+                if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King || move.CreatedKing)
                 {
                     int newXTo = move.XTo + 2;
 
@@ -136,9 +160,22 @@ namespace DraughtsFramework
             }
         }
 
-        // Space is empty
+        /// <summary>
+        /// Checks that the space being moved to is empty
+        /// </summary>
+        /// <param name="board">Board to check against</param>
+        /// <param name="move">Move to check against</param>
+        /// <returns></returns>
         public static bool IsEmptySpace(int[,] board, Move move) => IsEmptySpace(board, move.XTo, move.YTo);
 
+
+        /// <summary>
+        /// Checks that the space being moved to is empty
+        /// </summary>
+        /// <param name="board">Board to check against</param>
+        /// <param name="xTo">X position to check against</param>
+        /// <param name="yTo">Y position to check against</param>
+        /// <returns></returns>
         private static bool IsEmptySpace(int[,] board, int xTo, int yTo) => board[xTo, yTo] == Pieces.Empty;
     }
 }

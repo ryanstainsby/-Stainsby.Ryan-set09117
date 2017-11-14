@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
  
 namespace DraughtsFramework
 {
     public class DraughtsAI
     {
+        // Stores the player the moves being evaluated for
         int? originalPlayer = null;
 
+        /// <summary>
+        /// Returns the best move the algorith predicts can be made
+        /// </summary>
         public Move GetBestMove(Board board, MoveNode prevMove, int player, int depth)
         {
             originalPlayer = player;
@@ -16,18 +19,27 @@ namespace DraughtsFramework
             
             foreach (MoveNode child in nextMove.Children)
             {
-                int alpha = -100;
-                int beta = +100;
-                child.Value = AlphaBeta(child, alpha, beta);
+                child.Value = AlphaBeta(child, -100, +100);
             }
 
-            var highestValues = nextMove.Children.GroupBy(x => x.Value).OrderByDescending(g => g.Key).First().ToArray();
-            var random = new Random();
-            MoveNode randomMove = highestValues[random.Next(highestValues.Count() - 1)];
-            
-            return (randomMove.Move);
+            // Check there is a legal move to make
+            if (nextMove.Children.Count != 0)
+            {
+                var highestValues = nextMove.Children.GroupBy(x => x.Value).OrderByDescending(g => g.Key).First().ToArray();
+                var random = new Random();
+                MoveNode randomMove = highestValues[random.Next(highestValues.Count() - 1)];
+
+                return (randomMove.Move);
+            }
+            else
+            {
+                return null;
+            }
         }
 
+        /// <summary>
+        /// Alpha Beta search to return the value of a node  
+        /// </summary>
         private int AlphaBeta(MoveNode node, int alpha, int beta)
         {
             int bestValue;
@@ -50,11 +62,6 @@ namespace DraughtsFramework
                         break;
                     }
                 }
-
-                if (bestValue > node.Value)
-                {
-                    return bestValue;
-                }
             }
             else
             {
@@ -70,16 +77,19 @@ namespace DraughtsFramework
                         break;
                     }
                 }
-
-                if (bestValue < node.Value)
-                {
-                    return bestValue;
-                }
             }
 
-            return node.Value;
+            return bestValue;
         }
 
+        /// <summary>
+        /// Builds a move tree of all possible moves a player can make from the current board state and assigns values to each
+        /// </summary>
+        /// <param name="board">Current board state</param>
+        /// <param name="prevMove">Last move made</param>
+        /// <param name="player">Player tree is being built for</param>
+        /// <param name="depth">How many levels should be generated for the tree</param>
+        /// <returns></returns>
         private MoveNode BuildMoveTree(Board board, MoveNode prevMove, int player, int depth)
         {
             MoveNode currentPosition = prevMove ?? new MoveNode(board, prevMove?.Move ?? null, null);
@@ -128,6 +138,9 @@ namespace DraughtsFramework
             }
         }
 
+        /// <summary>
+        /// Returns a list of a legal moves a that can be made by a player for the current board state and assigns a value to each
+        /// </summary>
         private List<MoveNode> FindAllLegalMoves(MoveNode parentNode, int player, int depth)
         {
             var moves = new List<MoveNode>();
@@ -174,6 +187,9 @@ namespace DraughtsFramework
             return moves;
         }
 
+        /// <summary>
+        /// Checks a move is legal and assigns a value to it
+        /// </summary>
         private void CheckAndValueMove(List<MoveNode> moves, MoveNode parentNode, Move move, int depth)
         {
             Board copyBoard = new Board
@@ -192,6 +208,9 @@ namespace DraughtsFramework
             }
         }
 
+        /// <summary>
+        /// Checks a move is legal and assigns a value to it
+        /// </summary>
         private MoveNode CheckAndValueMove(MoveNode parentNode, Move move, int depth)
         {
             Board copyBoard = new Board
@@ -210,6 +229,9 @@ namespace DraughtsFramework
             return null;
         }
 
+        /// <summary>
+        /// Returns the value of a move
+        /// </summary>
         private int GetMoveValue(Board board, Move move, int depth)
         {
             int moveValue = 0;
@@ -234,7 +256,7 @@ namespace DraughtsFramework
             }
             else if (board.IsWinner())
             {
-                moveValue = 100;
+                moveValue = 200;
             }
 
             moveValue = moveValue * (depth);
