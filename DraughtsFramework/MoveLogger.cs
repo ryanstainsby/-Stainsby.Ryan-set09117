@@ -10,14 +10,14 @@ namespace DraughtsFramework
     public class MoveLogger
     {
         // A log of moves that can be undone
-        private Stack<Move> undoList;
+        private Stack<Move> undoStack;
         // A log of moves that can be redone
-        private Stack<Move> redoList;
+        private Stack<Move> redoStack;
 
         public MoveLogger()
         {
-            undoList = new Stack<Move>();
-            redoList = new Stack<Move>();
+            undoStack = new Stack<Move>();
+            redoStack = new Stack<Move>();
         }
 
         /// <summary>
@@ -26,8 +26,8 @@ namespace DraughtsFramework
         /// <param name="move">Move to be added to the log</param>
         public void AddMove(Move move)
         { 
-            undoList.Push(move);
-            redoList.Clear();
+            undoStack.Push(move);
+            redoStack.Clear();
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace DraughtsFramework
         /// </summary>
         public Move UndoMove()
         {
-            Move move = undoList.Pop();
+            Move move = undoStack.Pop();
 
-            redoList.Push(move);
+            redoStack.Push(move);
 
             return move;
         }
@@ -47,9 +47,9 @@ namespace DraughtsFramework
         /// </summary>
         public Move RedoMove()
         {
-            Move move = redoList.Pop();
+            Move move = redoStack.Pop();
 
-            undoList.Push(move);
+            undoStack.Push(move);
 
             return move;
         }
@@ -59,7 +59,7 @@ namespace DraughtsFramework
         /// </summary>
         public Stack<Move> GetFullLog()
         {
-            return undoList;
+            return undoStack;
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace DraughtsFramework
         /// <returns></returns>
         public Move GetLastMove()
         {
-            if (undoList.Count > 0)
+            if (undoStack.Count > 0)
             {
-                return undoList.Peek();
+                return undoStack.Peek();
             }
             else
             {
@@ -83,7 +83,7 @@ namespace DraughtsFramework
         /// </summary>
         public bool UndoLogIsEmpty()
         {
-            return undoList.Count == 0;
+            return undoStack.Count == 0;
         }
 
 
@@ -93,23 +93,23 @@ namespace DraughtsFramework
         /// <returns></returns>
         public bool RedoLogIsEmpty()
         {
-            return redoList.Count == 0;
+            return redoStack.Count == 0;
         }
 
         /// <summary>
-        /// Saves the list of all current moves
+        /// Saves the Stack of all current moves
         /// </summary>
         public void SaveGame()
         {          
-            File.WriteAllText("saved_game.json", Environment.NewLine + Newtonsoft.Json.JsonConvert.SerializeObject(undoList));                            
+            File.WriteAllText("saved_game.json", Environment.NewLine + Newtonsoft.Json.JsonConvert.SerializeObject(undoStack));                            
         }
 
         /// <summary>
-        /// Loads the saved list of moves
+        /// Loads the saved Stack of moves
         /// </summary>
         public void LoadGame()
         {
-            redoList = Newtonsoft.Json.JsonConvert.DeserializeObject<Stack<Move>>(File.ReadAllText("saved_game.json"));
+            redoStack = Newtonsoft.Json.JsonConvert.DeserializeObject<Stack<Move>>(File.ReadAllText("saved_game.json"));
         }
     }
 }
