@@ -6,8 +6,6 @@ namespace DraughtsFramework
     {    
         // Represents all the positions on the board and the pieces within each
         public int[,] piecePositions = new int[8,8];
-        public int whitePieces = 12;
-        public int blackPieces = 12;
 
         public Board()
         {
@@ -56,19 +54,7 @@ namespace DraughtsFramework
                     int xSpaceMovedOver = move.XTo > move.XFrom ? move.XFrom + 1 : move.XFrom - 1;
                     int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
-                    piecePositions[xSpaceMovedOver, ySpaceMovedOver] = 0;           
-                    
-                    switch (move.PieceTaken)
-                    {
-                        case Pieces.White_King:
-                        case Pieces.White_Man:
-                            whitePieces--;
-                            break;
-                        case Pieces.Black_King:
-                        case Pieces.Black_Man:
-                            blackPieces--;
-                            break;
-                    }
+                    piecePositions[xSpaceMovedOver, ySpaceMovedOver] = 0;                              
                 }
 
                 piecePositions[move.XFrom, move.YFrom] = 0;
@@ -98,18 +84,6 @@ namespace DraughtsFramework
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
                 piecePositions[xSpaceMovedOver, ySpaceMovedOver] = move.PieceTaken;
-
-                switch (move.PieceTaken)
-                {
-                    case Pieces.White_King:
-                    case Pieces.White_Man:
-                        whitePieces++;
-                        break;
-                    case Pieces.Black_King:
-                    case Pieces.Black_Man:
-                        blackPieces++;
-                        break;
-                }
             }           
         }
 
@@ -138,18 +112,6 @@ namespace DraughtsFramework
                 int ySpaceMovedOver = move.YTo > move.YFrom ? move.YFrom + 1 : move.YFrom - 1;
 
                 piecePositions[xSpaceMovedOver, ySpaceMovedOver] = Pieces.Empty;
-
-                switch (move.PieceTaken)
-                {
-                    case Pieces.White_King:
-                    case Pieces.White_Man:
-                        whitePieces--;
-                        break;
-                    case Pieces.Black_King:
-                    case Pieces.Black_Man:
-                        blackPieces--;
-                        break;
-                }
             }            
         }
 
