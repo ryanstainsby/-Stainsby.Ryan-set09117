@@ -113,7 +113,7 @@ namespace DraughtsFramework
             {
                 int newYTo = move.YTo - 2;
 
-                if (move.Piece == Pieces.White_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King || move.CreatedKing)
+                if (move.Piece == Pieces.White_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
                 {
                     int newXTo = move.XTo - 2;
 
@@ -123,7 +123,7 @@ namespace DraughtsFramework
                     }
                 }
 
-                if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King || move.CreatedKing)
+                if (move.Piece == Pieces.Black_Man || move.Piece == Pieces.Black_King || move.Piece == Pieces.White_King)
                 {
                     int newXTo = move.XTo + 2;
 

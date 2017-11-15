@@ -120,7 +120,7 @@ namespace DraughtsFramework
 
             void AddChildrenToNode(MoveNode possibleMove)
             {
-                if (possibleMove.Value != 100 || possibleMove.Value != -100)
+                if (possibleMove.Value != 100 && possibleMove.Value != -100)
                 {
                     if (possibleMove.Move.SuccessiveMoves != null)
                     {                        
