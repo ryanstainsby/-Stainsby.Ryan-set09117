@@ -140,7 +140,7 @@ namespace DraughtsConsole
 
             void MakeAiMove()
             {
-                Move move = ai.GetBestMove(board, new MoveNode(board, logger.GetLastMove()), player, 5);
+                Move move = ai.GetBestMove(board, new MoveNode(board, logger.GetLastMove()), player, 3);
 
                 // There's no legal move to make, automatic win to the other player
                 if (move == null)

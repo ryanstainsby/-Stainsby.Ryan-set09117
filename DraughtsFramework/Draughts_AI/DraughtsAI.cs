@@ -15,13 +15,8 @@ namespace DraughtsFramework
         public Move GetBestMove(Board board, MoveNode prevMove, int player, int depth)
         {
             originalPlayer = player;
-            MoveNode nextMove = BuildMoveTree(board, prevMove, player, depth);
-            
-            foreach (MoveNode child in nextMove.Children)
-            {
-                child.Value = AlphaBeta(child, -100, +100);
-            }
-
+            MoveNode nextMove = BuildAlphaBeta(board, prevMove, player, depth);
+                      
             // Check there is a legal move to make
             if (nextMove.Children.Count != 0)
             {
@@ -38,59 +33,14 @@ namespace DraughtsFramework
         }
 
         /// <summary>
-        /// Alpha Beta search to return the value of a node  
-        /// </summary>
-        private int AlphaBeta(MoveNode node, int alpha, int beta)
-        {
-            int bestValue;
-
-            if (node.Children.Count == 0)
-            {
-                bestValue = node.Value;
-            }
-            else if (node.Move.Player == originalPlayer)
-            {
-                bestValue = alpha;
-
-                // Recurse for all children of node.
-                for (int i = 0; i < node.Children.Count; i++)
-                {
-                    var childValue = AlphaBeta(node.Children[i], bestValue, beta);
-                    bestValue = Math.Max(bestValue, childValue);
-                    if (beta <= bestValue)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                bestValue = beta;
-
-                // Recurse for all children of node.
-                for (int i = 0; i < node.Children.Count; i++)
-                {
-                    var childValue = AlphaBeta(node.Children[i], alpha, bestValue);
-                    bestValue = Math.Min(bestValue, childValue);
-                    if (bestValue <= alpha)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return bestValue;
-        }
-
-        /// <summary>
-        /// Builds a move tree of all possible moves a player can make from the current board state and assigns values to each
+        /// Returns a tree off a nodes possible moves with values assigned using alpha beta pruning
         /// </summary>
         /// <param name="board">Current board state</param>
         /// <param name="prevMove">Last move made</param>
         /// <param name="player">Player tree is being built for</param>
         /// <param name="depth">How many levels should be generated for the tree</param>
         /// <returns></returns>
-        private MoveNode BuildMoveTree(Board board, MoveNode prevMove, int player, int depth)
+        private MoveNode BuildAlphaBeta(Board board, MoveNode prevMove, int player, int depth)
         {
             MoveNode currentPosition = prevMove ?? new MoveNode(board, prevMove?.Move ?? null, null);
 
@@ -98,44 +48,47 @@ namespace DraughtsFramework
             {
                 if (currentPosition.Move != null && currentPosition.Move.SuccessiveMoves != null)
                 {
+                    int bestMoveScore = player == originalPlayer.Value ? 0 : -100;
+
                     foreach (var move in currentPosition.Move.SuccessiveMoves)
                     {
-                        MoveNode possibleMove = CheckAndValueMove(currentPosition, move, depth);
+                        MoveNode sucMove = CheckAndValueMove(currentPosition, move, depth);
+                        MoveNode possibleMove = BuildAlphaBeta(sucMove.Board, sucMove, player, depth - 1);
 
                         if (possibleMove == null) continue;
 
-                        AddChildrenToNode(possibleMove);
+                        if ((player == originalPlayer && possibleMove.Value > bestMoveScore) || (player != originalPlayer && possibleMove.Value < bestMoveScore))
+                        {
+                            bestMoveScore = possibleMove.Value;
+                        }
+
+                        possibleMove.Parent = currentPosition;
+                        currentPosition.AddChild(possibleMove);
                     }
                 }
                 else
                 {
-                    foreach (var moveNode in FindAllLegalMoves(currentPosition, player, depth))
+                    int bestMoveScore = player == originalPlayer.Value ? -100 : 100;
+
+                    foreach (var move in FindAllLegalMoves(currentPosition, player, depth))
                     {
-                        AddChildrenToNode(moveNode);
-                    }
-                }                
-            }
+                        MoveNode possibleMove = BuildAlphaBeta(move.Board, move, player == 1 ? 2 : 1, depth - 1);
+                                                
+                        if ((player == originalPlayer && possibleMove.Value > bestMoveScore) || (player != originalPlayer && possibleMove.Value < bestMoveScore))
+                        {
+                            bestMoveScore = possibleMove.Value;
+                        }
 
-            return currentPosition;
-
-            void AddChildrenToNode(MoveNode possibleMove)
-            {
-                if (possibleMove.Value != 100 && possibleMove.Value != -100)
-                {
-                    if (possibleMove.Move.SuccessiveMoves != null)
-                    {                        
-                        possibleMove = BuildMoveTree(possibleMove.Board, possibleMove, player, depth - 1);
-                    }
-                    else
-                    {
-                        possibleMove = BuildMoveTree(possibleMove.Board, possibleMove, player == 1 ? 2 : 1, depth - 1);
+                        possibleMove.Parent = currentPosition;
+                        currentPosition.AddChild(possibleMove);
                     }
 
-                    possibleMove.Parent = currentPosition;
+                    currentPosition.Value += bestMoveScore;
                 }
 
-                currentPosition.AddChild(possibleMove);
             }
+
+            return currentPosition;       
         }
 
         /// <summary>
@@ -258,8 +211,6 @@ namespace DraughtsFramework
             {
                 moveValue = 200;
             }
-
-            moveValue = moveValue * (depth);
 
             return moveValue;
         }
